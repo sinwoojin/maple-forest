@@ -11,33 +11,31 @@
   for(const job of Object.keys(G.jobs))weaponNames[job].forEach((name,tier)=>{const id=`${job}-${tier}`;G.items[id]={id,name,slot:'weapon',job,attack:[0,9,18,30][tier],defense:0,rarity:['일반','고급','희귀','영웅'][tier],sell:[5,30,70,120][tier]};});
   ['여행자의 망토','단풍 가죽옷','동굴 수정 갑옷'].forEach((name,tier)=>{const id=`armor-${tier}`;G.items[id]={id,name,slot:'armor',job:'all',attack:0,defense:[0,3,7][tier],rarity:['일반','고급','희귀'][tier],sell:[5,25,60][tier]};});
   G.initializeGear=()=>{const p=G.p;for(const id of [`${p.job}-0`,'armor-0'])if(!p.inventory.includes(id))p.inventory.push(id);if(!p.equipment.weapon)p.equipment.weapon=`${p.job}-0`;if(!p.equipment.armor)p.equipment.armor='armor-0';};
-  G.equipmentStats=()=>Object.values(G.p.equipment).reduce((stats,id)=>{const item=G.items[id];if(item){stats.attack+=item.attack;stats.defense+=item.defense;}return stats;},G.p.run?.active?{...G.p.run.buffs}:{attack:0,defense:0});
+  G.equipmentStats=()=>Object.values(G.p.equipment).reduce((stats,id)=>{const item=G.items[id];if(item){stats.attack+=item.attack;stats.defense+=item.defense;}return stats;},G.p.run?.active?{attack:G.p.run.buffs?.attack||0,defense:G.p.run.buffs?.defense||0}:{attack:0,defense:0});
   G.canChangeJob=()=>!G.p.run?.active&&(!G.running||(G.p.zone==='forest'&&Math.abs(G.p.x-230)<110));
-  G.setJob=id=>{if(!Object.hasOwn(G.jobs,id))return false;if(!G.canChangeJob()){G.notify('직업은 숲의 루미 옆에서 변경할 수 있어요.');return false;}const p=G.p;p.job=id;G.initializeGear();p.equipment.weapon=p.inventory.filter(key=>G.items[key].job===id&&G.items[key].slot==='weapon').sort((a,b)=>G.items[b].attack-G.items[a].attack)[0];p.attack=0;p.skill=0;G.projectiles=[];G.save();return true;};
+  G.setJob=id=>{if(!Object.hasOwn(G.jobs,id))return false;if(!G.canChangeJob()){G.notify('직업은 숲의 루미 옆에서 변경할 수 있어요.');return false;}const p=G.p;p.job=id;p.build=undefined;G.initializeGear();p.equipment.weapon=p.inventory.filter(key=>G.items[key].job===id&&G.items[key].slot==='weapon').sort((a,b)=>G.items[b].attack-G.items[a].attack)[0];p.attack=0;p.skill=0;G.projectiles=[];G.save();return true;};
   G.equip=id=>{const item=G.items[id],p=G.p;if(!item||!p.inventory.includes(id)||(item.job!=='all'&&item.job!==p.job))return false;p.equipment[item.slot]=id;G.save();return true;};
   G.sell=id=>{const item=G.items[id],p=G.p;if(!item||!p.inventory.includes(id)||Object.values(p.equipment).includes(id)||id.endsWith('-0'))return false;p.inventory=p.inventory.filter(key=>key!==id);p.gold+=item.sell;G.save();return true;};
-  G.awardItem=id=>{const item=G.items[id],p=G.p;if(p.inventory.includes(id)){p.gold+=item.sell;G.notify(`${item.name} 중복 획득 · ${item.sell} 골드로 교환했어요.`);}else{p.inventory.push(id);G.notify(`${item.name} 획득! 가방에서 장착하세요.`);}G.emit(p.x,p.y-110,item.name,'#f7b749');};
+  G.awardItem=id=>{const item=G.items[id],p=G.p;if(!item)return false;if(p.inventory.includes(id)){p.gold+=item.sell;G.notify(`${item.name} 중복 획득 · ${item.sell} 골드로 교환했어요.`);}else{p.inventory.push(id);G.notify(`${item.name} 획득! 가방에서 장착하세요.`);}G.emit(p.x,p.y-110,item.name,'#f7b749');};
   G.dropLoot=e=>{if(e.kind==='boss'){G.awardItem(`${G.p.job}-${e.zone==='cavern'?3:2}`);return;}G.p.lootKills++;if(G.p.lootKills%3===0){const armor=G.p.lootKills%6===0;G.awardItem(armor?`armor-${e.zone==='cavern'?2:1}`:`${G.p.job}-1`);}};
-  G.attackAction=skill=>{const p=G.p,job=G.jobs[p.job];if(p.run?.active&&p.run.phase!=='battle')return;if(p.attack>0)return;if(skill&&(p.mp<job.mpCost||p.cooldown>0)){G.notify(p.mp<job.mpCost?'마나가 부족해요. 잠시 쉬면 회복됩니다.':`${job.skillName} 준비 중이에요.`);return;}
-    if(skill){p.mp-=job.mpCost;p.cooldown=p.job==='mage'?2.4:p.job==='archer'?2:1.6;p.skill=.4;}p.attack=skill?.4:.28;G.beep(skill?650:260);
-    const damage=Math.round((skill?42:18)+p.level*5+G.equipmentStats().attack*(skill?1.6:1));
-    if(p.job==='warrior'||(p.job==='mage'&&skill)){const reach=p.job==='mage'?235:skill?245:105;for(const e of G.enemies){const dx=e.x-p.x,dy=e.y-p.y;const inRange=p.job==='mage'?Math.hypot(dx,dy)<reach:Math.abs(dx)<reach&&dx*p.dir>-28&&Math.abs(dy)<85;if(inRange&&G.hitEnemy(e,damage)){e.x+=p.dir*(e.kind==='boss'?5:18);G.beep(500,.07);}}}
-    else G.projectiles.push({x:p.x+p.dir*24,y:p.y-33,vx:p.dir*(p.job==='archer'?800:590),kind:p.job==='archer'?'arrow':'orb',life:skill?1.4:1.1,damage,pierce:skill?3:1,charged:skill,hit:new Set()});
+  G.save=()=>false;G.load=()=>false;
+  G.compareItem=id=>{const item=G.items[id];if(!item)return null;const current=G.items[G.p.equipment[item.slot]];return {item,current,attack:item.attack-(current?.attack||0),defense:item.defense-(current?.defense||0),equipped:current?.id===id,canEquip:item.job==='all'||item.job===G.p.job,canSell:!Object.values(G.p.equipment).includes(id)&&!id.endsWith('-0'),materials:Math.max(1,Math.floor(item.sell/15))};};
+  G.dismantle=id=>{const item=G.items[id],p=G.p;if(!item||!p.inventory.includes(id)||Object.values(p.equipment).includes(id)||id.endsWith('-0'))return false;p.inventory=p.inventory.filter(key=>key!==id);p.materials=(p.materials||0)+Math.max(1,Math.floor(item.sell/15));G.save();return true;};
+  for(const item of Object.values(G.items)){item.tags=item.slot==='armor'?['defense']:['attack',item.job];item.description=item.slot==='armor'?`받는 피해 ${item.defense} 감소`:`공격력 +${item.attack} · 기술에 1.6배 적용`;}
+  const traits={
+   'warrior-1':{id:'longblade',text:'검격 범위 +30 · 출혈 적에게 접근하기 쉬움'},
+   'warrior-2':{id:'parryblade',text:'기술 후 0.5초 방어 · 반격 빌드는 방어 0.5초 연장'},
+   'warrior-3':{id:'lungeblade',text:'기술 사용 시 전방 70 이동과 0.2초 무적 · 마나 5 추가 소모'},
+   'archer-1':{id:'snarearrow',text:'화살 명중 시 0.8초 둔화 · 냉기 효과와 중첩 연장'},
+   'archer-2':{id:'drillarrow',text:'모든 화살의 관통 횟수 +1 · 관통 빌드와 합산'},
+   'archer-3':{id:'spiritarrow',text:'화살 명중 시 마나 1 회복 · 기술 재사용 20% 증가'},
+   'mage-1':{id:'manawand',text:'일반 마력탄 명중 시 마나 1 회복 · 비전 빌드와 합산'},
+   'mage-2':{id:'icewand',text:'기술 명중 시 적 0.4초 빙결 · 겨울 빌드 빙결 연장'},
+   'mage-3':{id:'emberwand',text:'기술이 3초 불길 생성 · 마나 5 추가 소모'},
+   'armor-1':{id:'herbalcloak',text:'물약 회복량 +20 · 긴 원정의 물약 효율 증가'},
+   'armor-2':{id:'froststep',text:'회피 시 주변 적 1.2초 둔화 · 냉기 효과와 중첩 연장'}
   };
-  const numeric=['level','xp','gold','hp','mp','potions','kills','quest'];
-  G.save=()=>{try{const p=G.p,data={version:3};G.snapshotRun?.();if(p.run)data.run=p.run;for(const key of [...numeric,'bossDead','won','job','inventory','equipment','zone','caveKills','caveBossDead','caveWon','lootKills'])data[key]=p[key];localStorage.setItem('maple-forest-v1',JSON.stringify(data));G.saved=true;return true;}catch{G.saved=false;return false;}};
-  G.load=()=>{try{const raw=localStorage.getItem('maple-forest-v1');if(!raw)return false;const d=JSON.parse(raw);if(!d||![1,2,3].includes(d.version))return false;const p=G.defaults();
-    for(const key of numeric){if(!Number.isFinite(d[key])||d[key]<0)return false;p[key]=Math.floor(d[key]);}
-    if(p.level<1||p.level>10000||p.quest>2||p.xp>=50+(p.level-1)*35)return false;
-    p.maxHp=100+(p.level-1)*20;p.maxMp=60+(p.level-1)*8;p.hp=Math.min(p.maxHp,Math.max(1,p.hp));p.mp=Math.min(p.maxMp,p.mp);p.bossDead=d.bossDead===true;p.won=d.won===true;
-    if(d.version>=2){if(!Object.hasOwn(G.jobs,d.job)||!['forest','cavern'].includes(d.zone)||!Array.isArray(d.inventory)||d.inventory.some(id=>typeof id!=='string'||!Object.hasOwn(G.items,id))||!d.equipment)return false;
-      p.job=d.job;p.zone=d.zone;p.inventory=[...new Set(d.inventory)];
-      for(const slot of ['weapon','armor']){const id=d.equipment[slot],item=G.items[id];if(!item||item.slot!==slot||!p.inventory.includes(id)||(item.job!=='all'&&item.job!==p.job))return false;p.equipment[slot]=id;}
-      for(const key of ['caveKills','lootKills']){if(!Number.isSafeInteger(d[key])||d[key]<0)return false;p[key]=d[key];}
-      p.caveBossDead=d.caveBossDead===true;p.caveWon=d.caveWon===true;if(p.zone==='cavern'&&!p.bossDead)p.zone='forest';
-    }else p.lootKills=p.kills;
-    if(G.parseRun)p.run=G.parseRun(d.version===3?d.run:undefined);
-    G.p=p;G.initializeGear();p.x=p.zone==='cavern'?180:220;G.projectiles=[];G.effects=[];G.populate();G.saved=true;return true;
-  }catch{return false;}};
+  for(const [id,trait]of Object.entries(traits)){G.items[id].traits=[trait.id];G.items[id].tags.push(trait.id);G.items[id].description+=' · '+trait.text;}
+  G.gearTraits=()=>new Set(Object.values(G.p.equipment).flatMap(id=>G.items[id]?.traits||[]));
   G.initializeGear();G.populate();
 })();

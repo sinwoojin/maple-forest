@@ -1,0 +1,8 @@
+.omo
+.git
+.vercel
+node_modules
+evidence
+artifacts
+*.log
+.env*

@@ -14,3 +14,11 @@ node_modules/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Private team state, captures, generated static bundle and hosting credentials
+.omo/
+.vercel/
+public/
+evidence/
+artifacts/
+*.token

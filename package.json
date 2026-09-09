@@ -1,0 +1,11 @@
+{
+  "name": "maple-forest",
+  "version": "4.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node mobile-server.cjs",
+    "test": "node --test --test-isolation=none tests/*.test.cjs tests/run-content.cjs",
+    "build": "node scripts/package-static.cjs",
+    "test:browser": "node tests/ui-smoke.cjs"
+  }
+}

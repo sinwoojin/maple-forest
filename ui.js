@@ -10,7 +10,7 @@
   $('jobs').onclick=()=>U.jobs();$('inventory').onclick=U.inventory;$('pause').onclick=U.pause;$('help').onclick=U.help;
   $('sound').onclick=()=>{G.sound=!G.sound;$('sound').textContent=G.sound?'소리 켜짐':'소리 꺼짐';$('sound').setAttribute('aria-label',G.sound?'효과음 끄기':'효과음 켜기');$('sound').setAttribute('aria-pressed',String(G.sound));G.beep(600);};
   const mapping={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',KeyZ:'attack'};
-  const actions={Space:'jump',ArrowUp:'jump',KeyW:'jump',KeyX:'skill',KeyC:'potion',KeyE:'interact'};
+  const actions={ShiftLeft:'dodge',ShiftRight:'dodge',Space:'jump',ArrowUp:'jump',KeyW:'jump',KeyX:'skill',KeyC:'potion',KeyE:'interact'};
   window.addEventListener('keydown',e=>{
     if(e.code==='Escape'){e.preventDefault();if($('modal').open)U.close();else U.pause();return;}
     if(e.code==='Slash'&&e.shiftKey){e.preventDefault();U.help();return;}
