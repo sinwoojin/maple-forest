@@ -1,0 +1,16 @@
+# Local dependencies and runtime output
+node_modules/
+*.log
+.env
+.env.*
+!.env.example
+
+# Generated upload archives and local publishing bundles
+*.zip
+배포자료/
+장비외형-v*.png
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+desktop.ini
