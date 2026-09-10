@@ -6,6 +6,7 @@
     "start": "node mobile-server.cjs",
     "test": "node --test --test-isolation=none tests/*.test.cjs tests/run-content.cjs",
     "build": "node scripts/package-static.cjs",
-    "test:browser": "node tests/ui-smoke.cjs"
+    "test:browser": "node tests/ui-smoke.cjs",
+    "test:mobile": "node tests/mobile-ui.cjs"
   }
 }

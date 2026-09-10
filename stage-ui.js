@@ -9,7 +9,13 @@
     $('modal-body').querySelector('.decision-intro').textContent=description;
     const list=$('modal-body').querySelector('.reward-options');
     for(const item of choices){const b=document.createElement('button');b.className='reward-card';b.dataset.choice=String(item.id);b.disabled=item.enabled===false||item.affordable===false;
-      for(const [tag,text] of [['strong',item.title||item.name],['span',item.description],['small',[item.risk,item.rewardHint,item.synergy,item.cost!=null?`${item.cost} 골드`:null,b.disabled?item.reason:null].filter(Boolean).join(' · ')],['small',b.disabled?'조건 미충족':'선택 →']]){if(text){const el=document.createElement(tag);el.textContent=U.displayText(text);b.append(el);}}
+      const name=document.createElement('strong');name.textContent=U.displayText(item.title||item.name);b.append(name);
+      if(item.description){const effect=document.createElement('span');effect.className='choice-effect';effect.textContent=U.displayText(item.description);b.append(effect);}
+      const meta=document.createElement('span');meta.className='choice-meta';
+      const category=item.type?'경로':String(item.description).includes('불확실')?'확률 효과':'확정 효과';
+      for(const value of [category,item.risk&&'위험 '+item.risk,item.rewardHint,item.cost!=null?item.cost+' 골드':null])if(value){const badge=document.createElement('span');badge.textContent=U.displayText(value);meta.append(badge);}b.append(meta);
+      if(item.synergy){const detail=document.createElement('span');detail.className='choice-detail';detail.textContent='함께 활용: '+U.displayText(item.synergy);b.append(detail);}
+      const state=document.createElement('small');state.textContent=b.disabled?U.displayText(item.reason||'자원 또는 조건을 확인하세요'):'선택하기 →';b.append(state);
       b.onclick=()=>choose(item.id);list.append(b);
     }
   };
@@ -28,7 +34,7 @@
     U.show('갈림길의 원정',track()+'<div class="run-rules"><strong>40개의 여정 · 4명의 지배자</strong><p>전투, 갈림길, 사건과 야영지를 지나 자신만의 빌드를 만드세요. 10단계마다 보스가 기다립니다. 원정 레벨 1로 시작 · 장비 유지 · 획득 경험치는 귀환 시 반영됩니다. 메뉴를 닫아도 선택은 E로 다시 열 수 있습니다.</p></div>',actions,true);
     if(r)U.paragraph(`${r.stage} / 40 · ${phases[r.phase]||r.phase} · ${G.buildInfo?.().name||'전투 방식 미선택'}`);
   };
-  U.runReward=()=>U.choices(`${G.p.run.stage}단계 보상`,'한 가지를 선택합니다. 유물은 현재 빌드와의 조합을 확인하세요.',G.runRewards().map(r=>({...r,synergy:r.synergy||G.relicCatalog?.[r.item]?.synergy})),id=>{if(G.chooseRunReward(id))afterChoice();},[{text:'나중에 선택',run:U.close}]);
+  U.runReward=()=>U.choices(`${G.p.run.stage}단계 보상`,'현재 빌드: '+G.buildInfo().name+' · 한 가지를 선택합니다.',G.runRewards().map(r=>({...r,description:r.kind==='gear'?(G.items[r.item]?.description||r.description):r.description,synergy:r.synergy||G.relicCatalog?.[r.item]?.synergy})),id=>{if(G.chooseRunReward(id))afterChoice();},[{text:'나중에 선택',run:U.close}]);
   U.runRoute=()=>U.choices('숲길은 어디로 이어질까요?','위험과 보상을 비교하고 다음 길을 선택하세요.',G.routeChoices(),id=>{if(G.chooseRoute(id))afterChoice();});
   U.runEvent=()=>{const event=G.eventView();if(!event)return U.runDashboard();U.choices(event.title,event.description,event.result?[]:event.choices,id=>{if(G.chooseEventOption(id))G.openRunUI();},event.result?[{text:'이야기 계속',primary:true,run:()=>{G.continueRun();afterChoice();}}]:[]);if(event.result)U.paragraph(typeof event.result==='string'?event.result:event.result.text||event.result.description||JSON.stringify(event.result));};
   U.runShop=()=>U.choices('길 위의 작은 상점',`보유 ${G.p.gold} 골드 · 준비를 마치면 다음 길로 떠나세요.`,G.runShop(),id=>{if(G.buyRunItem(id))U.runShop();},[{text:'상점 떠나기',primary:true,run:()=>{G.continueRun();afterChoice();}}]);

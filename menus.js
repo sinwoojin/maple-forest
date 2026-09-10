@@ -2,9 +2,9 @@
 (() => {
   const G=window.Game,$=id=>document.getElementById(id),modal=$('modal');
   const U=G.UI={};
-  U.close=()=>{modal.close();G.paused=false;G.keys.clear();$('game').focus();};
+  U.close=()=>{modal.close();G.paused=false;G.clearInput();$('game').focus();};
   U.show=(title,body,actions=[],wide=false)=>{
-    G.paused=true;G.keys.clear();modal.classList.toggle('wide',wide);
+    G.paused=true;G.clearInput();modal.classList.toggle('wide',wide);modal.dataset.view=title;document.getElementById('modal-body').scrollTop=0;
     $('modal-title').textContent=title;$('modal-body').innerHTML=body;$('modal-actions').replaceChildren();
     for(const a of actions){const b=document.createElement('button');b.textContent=a.text;b.className=a.primary?'primary':'';b.onclick=a.run;$('modal-actions').append(b);}
     if(!modal.open)modal.showModal();

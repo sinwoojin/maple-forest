@@ -2,7 +2,15 @@
 (() => {
   const G=window.Game,canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
   const reducedPreference=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function resize(){const box=canvas.getBoundingClientRect();G.width=Math.round(720*box.width/box.height);G.height=720;G.textScale=Math.max(1,720/box.height);canvas.width=G.width;canvas.height=720;ctx.imageSmoothingEnabled=false;}
+  function resize(){
+    const box=canvas.getBoundingClientRect();if(box.width<=0||box.height<=0)return;
+    const mobile=matchMedia('(max-width:1000px)').matches;
+    G.viewHeight=mobile?(innerWidth>innerHeight?320:480):720;
+    G.width=G.viewHeight*box.width/box.height;G.height=720;
+    G.textScale=Math.max(1,G.viewHeight/box.height);
+    const ratio=Math.min(devicePixelRatio||1,2);
+    canvas.width=Math.round(box.width*ratio);canvas.height=Math.round(box.height*ratio);ctx.imageSmoothingEnabled=false;
+  }
   new ResizeObserver(resize).observe(canvas);resize();
   function label(x,y,text,color='#fff9e9',size=14){ctx.font=`bold ${size*(G.textScale||1)}px "Malgun Gothic",sans-serif`;ctx.textAlign='center';ctx.lineWidth=3*(G.textScale||1);ctx.strokeStyle='#352a24';ctx.strokeText(text,x,y);ctx.fillStyle=color;ctx.fillText(text,x,y);}
   function drawEnemy(e,t){
@@ -15,6 +23,8 @@
   }
   function draw(){
     const reduced=reducedPreference||G.settings?.reducedMotion;const p=G.p,cave=p.zone==='cavern',t=G.time,run=p.run?.active,info=run?G.runInfo():null;G.camera=Math.max(0,Math.min(G.worldWidth-G.width,p.x-G.width*.35));
+    const cameraY=Math.max(0,Math.min(720-G.viewHeight,p.y-G.viewHeight*.72));
+    ctx.setTransform(canvas.width/G.width,0,0,canvas.height/G.viewHeight,0,-cameraY*canvas.height/G.viewHeight);
     if(run)Art.stageBackground(ctx,G.camera,t,G.width,G.height,info);else (cave?Art.cavernBackground:Art.background)(ctx,G.camera,t,G.width,G.height);ctx.save();ctx.translate(-Math.round(G.camera),0);
     for(const platform of G.platforms){if(run)Art.stagePlatform(ctx,platform,info);else (cave?Art.cavernPlatform:Art.platform)(ctx,platform); }
     if(run){if(info.phase!=='battle'){Art.portal(ctx,G.worldWidth-100,610,t,true);label(G.worldWidth-100,490,'다음 원정으로','#fff9e9');}}else if(cave){Art.portal(ctx,100,610,t,true);label(100,490,'단풍숲으로','#8fc4d0');Art.portal(ctx,3070,610,t,p.caveBossDead);label(3070,490,'수정의 출구','#8fc4d0');}

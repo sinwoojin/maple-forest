@@ -53,3 +53,14 @@ Keyboard and touch actions, visible focus, text health values, readable Korean l
 - Settings uses opt-in SFX and original synthesized BGM, visual intensity off/low/full and reduced motion. Effects intensity never hides dangerous telegraphs. Enemy role silhouettes add shields, staff, bow, fuse, horns and healer marks; ground warnings have a bright outline, pattern and readable label.
 - Eight touch actions include dodge; portrait uses two reachable rows, landscape one row. Always-visible HP/MP/dodge strip. Labels and menu cards wrap without horizontal scrolling.
 - Accepted scope: spatial combat remains canvas based; menu keyboard/focus and text stats are accessible. Synthetic fixture QA is separate from natural gameplay duration evidence. No framework or image dependency is introduced.
+
+## Mobile UX implementation contract · 2026-09-10
+- Preserve the existing storybook palette, Canvas sprites, physics, saves and desktop surface. Existing-project redesign; no brand replacement or framework.
+- Personas: two-thumb phone player (360px portrait,844px short landscape), interrupted commuter (background/reorientation), menu reader with larger text, keyboard desktop player.
+- Mobile scroll ownership: viewport-height game shell, normal header + compact status/objective + flexible canvas + thumb dock. Only native dialog body scrolls while open; desktop document remains scrollable.
+- New primitives: mobile status strip with semantic HP/MP meters, compact objective and boss status; paired movement keys; 2x2 action cluster; separate utility row; mobile menu launcher. Existing paper rim/shadow retained. All actions have text, SVG symbol, focus and pressed feedback, cooldown/unavailable text.
+- Tokens: minimum touch44px, movement60px, action60px, primary attack68px, dock-gap8px, phone-padding8px, desktop spacing unchanged; phone text12/14/16/20px. Utility keys44px. Landscape dock96px with44px utility and56px combat keys. Ink/paper/amber/mana existing colors only; paper inset lighting retains physical key feel.
+- Portrait logical camera height480 and short-landscape320; world and physics remain720 coordinates. Camera crops vertically to track player. Canvas backing buffer caps DPR at2 and uses CSS size; visible/world transforms agree. Gameplay warning geometry remains unchanged.
+- Native modal becomes fixed header/body/footer scroll shell. Bag has one scroll owner, keeps sort/selected item/scroll after actions. Choice cards separate effects, cost/risk and optional detail; touch drag cannot trigger choices.
+- Input ownership is per pointer and per keyboard key. Pointer release/cancel/lostcapture, blur, hidden tab, orientation and modal open clear all held input. Orientation pauses active battle without changing run or decision. No auto attack/potion additions.
+- HUD refresh coalesces to100ms and writes only changed content. Existing camera art and settings remain. Physical mobile Safari cannot be certified by Chromium emulation.
