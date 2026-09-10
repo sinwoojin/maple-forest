@@ -1,5 +1,17 @@
 declare namespace MapleForest {
-  type EventId = 'spring' | 'bridge' | 'smith' | 'shrine' | 'fox' | 'archive' | 'garden' | 'gambler' | 'ghost' | 'nest' | 'crystal' | 'caravan';
+  type EventId =
+    | 'spring'
+    | 'bridge'
+    | 'smith'
+    | 'shrine'
+    | 'fox'
+    | 'archive'
+    | 'garden'
+    | 'gambler'
+    | 'ghost'
+    | 'nest'
+    | 'crystal'
+    | 'caravan';
   type RunPhase = 'battle' | 'route' | 'event' | 'shop' | 'rest' | 'reward' | 'complete' | 'failed';
   type JobId = 'warrior' | 'archer' | 'mage';
   type ResourceKey = 'gold' | 'potions' | 'materials' | 'mp';
@@ -17,7 +29,9 @@ declare namespace MapleForest {
   }
   type Effect =
     | (EffectRewards & { readonly chance?: never; readonly win?: never; readonly lose?: never })
-    | ({ readonly chance: number; readonly win: Effect; readonly lose: Effect } & { readonly [Key in keyof EffectRewards]?: never });
+    | ({ readonly chance: number; readonly win: Effect; readonly lose: Effect } & {
+        readonly [Key in keyof EffectRewards]?: never;
+      });
   interface EventOption {
     readonly id: string;
     readonly title: string;

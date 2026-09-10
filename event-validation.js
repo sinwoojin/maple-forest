@@ -3,7 +3,10 @@
 (() => {
     const G = window.Game;
     class EventSnapshotError extends Error {
-        constructor(message) { super(message); this.name = 'EventSnapshotError'; }
+        constructor(message) {
+            super(message);
+            this.name = 'EventSnapshotError';
+        }
     }
     const record = (raw) => typeof raw === 'object' && raw !== null && !Array.isArray(raw);
     const validSnapshot = (raw) => {
@@ -15,7 +18,11 @@
         const roll = raw['roll'], relic = raw['relic'], result = raw['result'], choice = raw['choice'];
         if (typeof roll !== 'number' || !Number.isFinite(roll) || roll < 0 || roll > 1)
             return false;
-        if (relic !== undefined && relic !== null && relic !== false && relic !== 0 && relic !== '' &&
+        if (relic !== undefined &&
+            relic !== null &&
+            relic !== false &&
+            relic !== 0 &&
+            relic !== '' &&
             (typeof relic !== 'string' || !Object.hasOwn(G.relicCatalog || {}, relic)))
             return false;
         if (result !== null && typeof result !== 'string')

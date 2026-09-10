@@ -1,0 +1,32 @@
+# Dependencies, generated bundles, private QA and caches
+node_modules/
+public/
+dist/
+build/
+coverage/
+.generated/
+.omo/
+.vercel/
+.cache/
+.codegraph/
+evidence/
+artifacts/
+outputs/
+test-results/
+playwright-report/
+# TypeScript compiler owns these classic scripts
+/event-data.js
+/events.js
+/event-validation.js
+# Machine-owned lock and golden compatibility fixture
+/package-lock.json
+/tests/fixtures/event-baseline.json
+# External libraries and packaged uploads
+vendor/
+third-party/
+*.min.js
+*.min.css
+*.zip
+*.gz
+*.tar
+배포자료/

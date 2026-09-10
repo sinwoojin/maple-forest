@@ -3,7 +3,10 @@
 (() => {
     const G = window.Game;
     class InvalidEventStateError extends Error {
-        constructor(message) { super(message); this.name = 'InvalidEventStateError'; }
+        constructor(message) {
+            super(message);
+            this.name = 'InvalidEventStateError';
+        }
     }
     const definition = (id) => {
         const data = G.runEventCatalog.find(event => event.id === id);
@@ -22,9 +25,10 @@
         r.event = {
             id: data.id,
             roll: G.runRandom(101),
-            relic: Object.keys(G.relicCatalog || {}).filter(id => !r.relics.includes(id))[Math.floor(G.runRandom(103) * Object.keys(G.relicCatalog || {}).filter(id => !r.relics.includes(id)).length)] || null,
+            relic: Object.keys(G.relicCatalog || {}).filter(id => !r.relics.includes(id))[Math.floor(G.runRandom(103) *
+                Object.keys(G.relicCatalog || {}).filter(id => !r.relics.includes(id)).length)] || null,
             result: null,
-            choice: null,
+            choice: null
         };
     };
     const reason = (c) => {
@@ -43,15 +47,28 @@
             return null;
         const data = definition(e.id);
         return {
-            id: data.id, title: data.title, description: data.description, result: e.result,
+            id: data.id,
+            title: data.title,
+            description: data.description,
+            result: e.result,
             choices: [
                 ...data.choices.map(c => ({
-                    id: c.id, title: c.title, description: c.description,
-                    chance: c.effect.chance, randomReward: !!c.effect.relic,
-                    enabled: !e.result && !reason(c), reason: reason(c),
+                    id: c.id,
+                    title: c.title,
+                    description: c.description,
+                    chance: c.effect.chance,
+                    randomReward: !!c.effect.relic,
+                    enabled: !e.result && !reason(c),
+                    reason: reason(c)
                 })),
-                { id: 'leave', title: '조용히 지나간다', description: '비용과 보상 없이 계속', enabled: !e.result, reason: '' },
-            ],
+                {
+                    id: 'leave',
+                    title: '조용히 지나간다',
+                    description: '비용과 보상 없이 계속',
+                    enabled: !e.result,
+                    reason: ''
+                }
+            ]
         };
     };
     const apply = (effect) => {

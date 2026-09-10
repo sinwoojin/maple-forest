@@ -25,17 +25,17 @@
 
 ## 조작
 
-| 입력 | 동작 |
-| --- | --- |
-| A/D, ←/→ | 이동 |
-| Space, W, ↑ | 점프 |
-| Z | 기본 공격 |
-| X | 직업 기술 |
-| Shift | 회피 |
-| C | 물약 |
-| E | 상호작용·원정 선택 다시 열기 |
-| I | 가방 |
-| Esc | 일시정지·창 닫기 |
+| 입력        | 동작                         |
+| ----------- | ---------------------------- |
+| A/D, ←/→    | 이동                         |
+| Space, W, ↑ | 점프                         |
+| Z           | 기본 공격                    |
+| X           | 직업 기술                    |
+| Shift       | 회피                         |
+| C           | 물약                         |
+| E           | 상호작용·원정 선택 다시 열기 |
+| I           | 가방                         |
+| Esc         | 일시정지·창 닫기             |
 
 모바일은 왼손으로 좌우 이동, 오른손으로 점프·스킬·회피·공격을 조작합니다. 이동하면서 공격·점프할 수 있으며, 스킬과 회피 버튼에 남은 시간이 표시됩니다. 세로·가로 화면을 모두 지원합니다.
 
@@ -77,3 +77,13 @@ npm run build
 ## 프로젝트 배경
 
 메이플스토리의 횡스크롤 모험과 PokéRogue의 연속 전투·선택 흐름에서 영감을 받았습니다. 공식 프로젝트가 아니며 원작 계정·서버·게임 에셋을 사용하지 않습니다. 그래픽과 사운드는 프로젝트 코드에서 생성합니다.
+
+## 코드 포맷
+
+`npm run format`으로 적용하고 `npm run format:check`로 파일 변경 없이 검사합니다. CI도 같은 범위를 검사합니다. npm에 고정한 Prettier 3.9.6을 사용하며 별도 ESLint/Biome/Git hook은 추가하지 않습니다.
+
+공백 2칸, JS·TS 작은따옴표, 세미콜론 사용, 권장 100자, 후행 쉼표 없음, LF를 적용합니다. JSON·HTML 속성은 해당 형식에 맞는 큰따옴표를 사용합니다. Markdown 문단 줄바꿈과 HTML 공백 의미, 템플릿 안의 문자열은 보존하도록 설정했습니다. EditorConfig와 Git 줄바꿈 규칙도 맞췄으며 Windows 실행용 cmd만 CRLF를 유지합니다. 개인 에디터 설정은 변경하지 않습니다.
+
+루트 게임 소스·설정·문서와 src/types/tests/scripts/docs의 JS·CJS·TS·JSON·CSS·HTML·Markdown, CI YAML이 대상입니다. 의존성·빌드·캐시·외부 라이브러리·압축 파일, npm lockfile, 자동 캡처한 이벤트 기준 JSON, TS에서 생성하는 루트 event-data.js/events.js/event-validation.js는 제외합니다. TS 소스를 포맷한 뒤 `npm run build:typed`로 생성 JS를 갱신해 함께 커밋하세요.
+
+설정 근거: [Prettier 옵션](https://prettier.io/docs/options), [제외 규칙](https://prettier.io/docs/ignore).
