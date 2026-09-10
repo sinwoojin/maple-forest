@@ -20,7 +20,7 @@
       if(e.code==='KeyI'&&!e.repeat&&!modal().open){e.preventDefault();G.UI.inventory();return;}
       if(!G.running||G.paused)return;
       if(holds[e.code]||actions[e.code])e.preventDefault();
-      if(holds[e.code]&&allowed()){keyboard.set(e.code,holds[e.code]);sync();}
+      if(holds[e.code]&&allowed()&&(!e.repeat||keyboard.has(e.code))){keyboard.set(e.code,holds[e.code]);sync();}
       if(!e.repeat&&actions[e.code])G.act(actions[e.code]);
     });
     window.addEventListener('keyup',e=>{keyboard.delete(e.code);sync();});

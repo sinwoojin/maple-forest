@@ -26,6 +26,7 @@
   menu.onclick=U.mobileMenu;
   const help=U.help;U.help=()=>{if(!mobile.matches)return help();U.show('두 손으로 떠나는 모험','<div class="touch-guide"><p><strong>왼손: 좌우 이동</strong><br>이동을 누른 채 오른손으로 점프나 공격을 함께 사용할 수 있어요.</p><p><strong>오른손: 공격 · 스킬 · 점프 · 회피</strong><br>공격은 누르는 동안 반복됩니다. 스킬과 회피 버튼의 남은 시간을 확인하세요.</p><p><strong>위험 예고를 보고 회피</strong><br>발밑의 경고를 벗어나거나 점프로 피하세요. 물약과 대화는 아래 작은 버튼에 있어요.</p><p>메뉴를 열거나 화면을 돌리면 잠시 멈춥니다. 보상 선택을 닫아도 상단 도전에서 이어갈 수 있어요.</p><p>넓게 보려면 가로 화면을 사용하세요. 설정 · 저장 파일에서 기기 간 기록을 옮길 수 있어요.</p></div>',[{text:'모험으로 돌아가기',primary:true,run:U.close}],true);};
   const updateButton=(action,detail,unavailable)=>{for(const b of document.querySelectorAll(`.touch-controls [data-action="${action}"]`)){text(b.querySelector('small'),detail);b.dataset.unavailable=String(unavailable);}};
+  const resetMobileScroll=()=>{if(mobile.matches)window.scrollTo(0,0);};mobile.addEventListener('change',resetMobileScroll);resetMobileScroll();
   const refresh=G.refresh;let last=0;
   G.refresh=()=>{const now=performance.now();if(now-last<100)return;last=now;refresh();document.body.classList.toggle('is-playing',G.running);
     if(!mobile.matches)return;const p=G.p,r=p.run,active=r?.active,info=active?G.runInfo():null;

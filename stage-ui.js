@@ -12,7 +12,7 @@
       const name=document.createElement('strong');name.textContent=U.displayText(item.title||item.name);b.append(name);
       if(item.description){const effect=document.createElement('span');effect.className='choice-effect';effect.textContent=U.displayText(item.description);b.append(effect);}
       const meta=document.createElement('span');meta.className='choice-meta';
-      const category=item.type?'경로':String(item.description).includes('불확실')?'확률 효과':'확정 효과';
+      const category=item.type?'경로':item.chance!=null?Math.round(item.chance*100)+'% 확률':item.randomReward?'무작위 보상':'확정 효과';
       for(const value of [category,item.risk&&'위험 '+item.risk,item.rewardHint,item.cost!=null?item.cost+' 골드':null])if(value){const badge=document.createElement('span');badge.textContent=U.displayText(value);meta.append(badge);}b.append(meta);
       if(item.synergy){const detail=document.createElement('span');detail.className='choice-detail';detail.textContent='함께 활용: '+U.displayText(item.synergy);b.append(detail);}
       const state=document.createElement('small');state.textContent=b.disabled?U.displayText(item.reason||'자원 또는 조건을 확인하세요'):'선택하기 →';b.append(state);

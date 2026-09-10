@@ -23,7 +23,7 @@
   }
   function draw(){
     const reduced=reducedPreference||G.settings?.reducedMotion;const p=G.p,cave=p.zone==='cavern',t=G.time,run=p.run?.active,info=run?G.runInfo():null;G.camera=Math.max(0,Math.min(G.worldWidth-G.width,p.x-G.width*.35));
-    const cameraY=Math.max(0,Math.min(720-G.viewHeight,p.y-G.viewHeight*.72));
+    const cameraY=Math.max(0,Math.min(720-G.viewHeight,p.y-G.viewHeight*.72));G.cameraY=cameraY;
     ctx.setTransform(canvas.width/G.width,0,0,canvas.height/G.viewHeight,0,-cameraY*canvas.height/G.viewHeight);
     if(run)Art.stageBackground(ctx,G.camera,t,G.width,G.height,info);else (cave?Art.cavernBackground:Art.background)(ctx,G.camera,t,G.width,G.height);ctx.save();ctx.translate(-Math.round(G.camera),0);
     for(const platform of G.platforms){if(run)Art.stagePlatform(ctx,platform,info);else (cave?Art.cavernPlatform:Art.platform)(ctx,platform); }
@@ -34,7 +34,7 @@
     Art.attack(ctx,p);for(const shot of G.projectiles)Art.projectile(ctx,shot);
     label(p.x,p.y+20,G.jobs[p.job].name+' · 단풍 여행자','#fff9e9',12);
     if(G.settings?.intensity!=='off'&&!reduced){if(run)Art.stageForeground(ctx,G.camera,t,G.width,G.height,info);else (cave?Art.cavernForeground:Art.foreground)(ctx,G.camera,t,G.width,G.height);}
-    for(const e of (G.settings?.intensity==='off'?[]:G.effects)){ctx.globalAlpha=Math.min(G.settings?.intensity==='low'?.5:1,e.life*3);label(e.x,e.y,e.text,e.color,e.text.includes('LEVEL')?32:24);}ctx.globalAlpha=1;ctx.restore();
+    for(const e of (G.settings?.intensity==='off'?[]:G.effects)){if(Art.combatLabel(e.text)!==e.text)continue;ctx.globalAlpha=Math.min(G.settings?.intensity==='low'?.5:1,e.life*3);label(e.x,e.y,Art.combatLabel(e.text),e.color,e.text.includes('LEVEL')?32:24);}ctx.globalAlpha=1;for(const h of G.hazards||[])Art.dangerLabel(ctx,h);ctx.restore();
   }
   let last=performance.now(),acc=0;
   function frame(now){acc+=Math.min((now-last)/1000,.08);last=now;while(acc>=1/60){G.update(1/60);acc-=1/60;}draw();if(G.refresh)G.refresh();requestAnimationFrame(frame);}
