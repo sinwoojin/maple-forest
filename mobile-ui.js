@@ -144,7 +144,7 @@
     text($('mobile-stage'), active ? `${r.stage} / 40` : `${G.jobs[p.job].name} Lv.${p.level}`);
     const objective = active
       ? r.phase === 'battle'
-        ? `${info.objective?.label || '적을 처치하세요'} · ${Math.ceil(info.objective?.remaining || 0)} 남음`
+        ? [G.objectiveView().progress, G.objectiveView().status].filter(Boolean).join(' · ')
         : '상단 도전에서 선택을 이어가세요'
       : document.getElementById('quest-copy').textContent;
     text($('mobile-objective'), objective);

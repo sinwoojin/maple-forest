@@ -62,7 +62,8 @@
         choice: e.choice,
         result: e.result
       })),
-      gearGained: [...gearGained]
+      gearGained: [...gearGained],
+      ...(r.outcome == null ? {} : { outcome: G.parseOutcome(r.outcome) })
     };
   };
   G.parseMeta = raw => {

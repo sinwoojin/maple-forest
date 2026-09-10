@@ -5,6 +5,10 @@
   G.runCopy = copy;
   G.freshRun = () => ({
     version: 4,
+    rulesVersion: 2,
+    nextEncounter: null,
+    seenObjectives: [],
+    outcome: null,
     active: false,
     started: false,
     seed: 0,
@@ -184,6 +188,21 @@
     if (r.phase !== 'battle') G.openRunUI?.();
     return true;
   };
+  G.captureRunOutcome = cause => {
+    const r = G.p.run,
+      o = r.objective;
+    r.outcome = {
+      cause,
+      objectiveType: o.type,
+      current: o.current,
+      target: o.target,
+      health: o.health,
+      timeLeft: o.timeLeft,
+      hp: G.p.hp,
+      maxHp: G.p.maxHp,
+      stage: r.stage
+    };
+  };
   G.finishRunRecord = cause => {
     const r = G.p.run;
     if (r.recorded) return;
@@ -201,13 +220,15 @@
       choices: copy(r.choices),
       events: copy(r.events),
       gearGained: copy(r.gearGained),
-      cause
+      cause,
+      outcome: copy(r.outcome)
     });
   };
   G.failRun = (cause = 'defeated') => {
     const r = G.p.run;
     if (!r.active || r.phase !== 'battle') return false;
     r.rewards = [];
+    G.captureRunOutcome(cause);
     r.buffs = { attack: 0, defense: 0 };
     G.finishRunRecord(cause);
     G.runTransition('failed');
@@ -233,12 +254,13 @@
       G.awardItem(c.item);
       r.gearGained.push(c.item);
     } else if (c.kind === 'heal') {
-      p.hp = p.maxHp;
-      p.mp = p.maxMp;
+      p.hp = r.rulesVersion === 2 ? Math.min(p.maxHp, p.hp + Math.ceil(p.maxHp * 0.4)) : p.maxHp;
+      p.mp = r.rulesVersion === 2 ? Math.min(p.maxMp, p.mp + Math.ceil(p.maxMp * 0.5)) : p.maxMp;
     } else if (c.kind === 'relic') G.grantRelic?.(c.item);
     else if (c.kind === 'materials') p.materials = (p.materials || 0) + c.value;
     else r.buffs.attack += c.value;
     if (r.stage === 40) {
+      G.captureRunOutcome('complete');
       G.finishRunRecord('complete');
       G.runTransition('complete');
     } else {
@@ -287,7 +309,8 @@
       {
         id: `${r.stage}:heal`,
         title: '생명의 샘',
-        description: '체력과 마나 완전 회복',
+        description:
+          r.rulesVersion === 2 ? '최대 체력의 40% · 최대 마나의 50% 회복' : '체력과 마나 완전 회복',
         kind: 'heal'
       },
       relic

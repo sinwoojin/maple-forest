@@ -87,10 +87,12 @@
       p.level++;
       p.maxHp += 20;
       p.maxMp += 8;
-      p.hp = p.maxHp;
-      p.mp = p.maxMp;
+      p.hp = p.run?.active && p.run.rulesVersion === 2 ? Math.min(p.maxHp, p.hp + 20) : p.maxHp;
+      p.mp = p.run?.active && p.run.rulesVersion === 2 ? Math.min(p.maxMp, p.mp + 8) : p.maxMp;
       G.emit(p.x, p.y - 90, 'LEVEL UP!', '#f7b749');
-      G.notify(`레벨 ${p.level}! 체력과 마나가 회복되었습니다.`);
+      G.notify(
+        `레벨 ${p.level}! ${p.run?.active && p.run.rulesVersion === 2 ? '최대치 증가 · HP +20 / MP +8' : '체력과 마나가 회복되었습니다.'}`
+      );
       G.beep(800, 0.25);
     }
   };

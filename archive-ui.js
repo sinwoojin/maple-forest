@@ -42,8 +42,10 @@
       for (const r of records) {
         add(
           `${r.completed ? '정복' : '도전'} · ${r.stage}/40 · ${G.jobs[r.job]?.name || r.job}`,
-          `${r.daily ? '오늘의 원정 · ' : ''}${Math.floor(r.elapsedSeconds / 60)}분 · ${r.cause || '완료'} · 시드 ${r.seed} · ${r.at || ''}`
+          `${r.daily ? '오늘의 원정 · ' : ''}${Math.floor(r.elapsedSeconds / 60)}분 · ${r.completed ? '완료' : '원정 종료'} · 시드 ${r.seed} · ${r.at || ''}`
         );
+        const outcome = G.outcomeView(r.outcome);
+        add(outcome.cause, outcome.snapshot);
         add(
           '이번 원정의 성장',
           `전투 방식: ${(r.builds || []).map(id => G.buildCatalog[id]?.name || id).join(', ')} · 유물: ${(r.relics || []).map(id => G.relicCatalog[id]?.name || id).join(', ') || '없음'} · 얻은 장비: ${(r.gearGained || []).map(id => G.items[id]?.name || id).join(', ') || '없음'}`
@@ -51,7 +53,7 @@
         add(
           '선택한 길과 이야기',
           (r.choices || [])
-            .map(c => `${c.stage}단계 ${c.type}`)
+            .map(c => `${c.stage}단계 ${G.objectiveTitle(c.type)}`)
             .concat((r.events || []).map(e => `${e.stage}단계 ${e.result || e.choice}`))
             .join(' → ') || '선택 기록 없음'
         );

@@ -53,7 +53,7 @@
           '이전 원정은 새 경로의 시작점으로 옮겼습니다. 장비와 성장 기록은 유지됩니다.'
       };
     }
-    const r = G.runCopy(raw);
+    const r = G.parseRunDetails(G.runCopy(raw));
     requireValid(
       typeof r.active === 'boolean' &&
         typeof r.started === 'boolean' &&

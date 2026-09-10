@@ -34,6 +34,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     await page.locator('#close-modal').click();
     await page.evaluate(() => {
       Game.p.run.phase = 'rest';
+      Game.p.run.nextEncounter = 'defeat';
       Game.p.run.restUsed = false;
       Game.openRunUI();
     });

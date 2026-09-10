@@ -2,6 +2,16 @@
 (() => {
   const G = window.Game,
     roles = ['charger', 'ranged', 'shield', 'leaper', 'bomber', 'summoner', 'healer', 'stealth'];
+  G.objectiveBlockReason = () => {
+    const o = G.p.run?.objective;
+    if (!o || !['escort', 'defense'].includes(o.type)) return null;
+    const x = o.type === 'defense' ? 800 : o.x;
+    if (G.enemies.some(e => e.hp > 0 && Math.abs(e.x - x) < 130 && Math.abs(e.y - 610) < 70))
+      return 'enemies';
+    if (Math.abs(G.p.x - x) >= (o.type === 'escort' ? 180 : 210)) return 'distance';
+    if (Math.abs(G.p.y - 610) >= (o.type === 'escort' ? 120 : 160)) return 'height';
+    return null;
+  };
   G.spawnEncounterWave = () => {
     const r = G.p.run,
       boss = r.nodeType === 'boss',
@@ -35,6 +45,7 @@
   G.enterEncounter = type => {
     const r = G.p.run;
     r.phase = 'battle';
+    r.nextEncounter = null;
     r.nodeType = r.stage % 10 === 0 ? 'boss' : type;
     r.wave = 0;
     r.waveClock = 0;
@@ -75,6 +86,11 @@
       timeLeft: kind === 'defense' ? 100 : 300
     };
     G.spawnEncounterWave();
+    r.seenObjectives ||= [];
+    if (!r.seenObjectives.includes(kind)) {
+      r.seenObjectives.push(kind);
+      G.notify(G.objectiveView?.().instruction || r.objective.label);
+    }
     G.save();
   };
   G.killRunEnemy = e => {
@@ -103,13 +119,14 @@
     dt = Math.min(dt, 0.25);
     r.elapsedSeconds += dt;
     r.waveClock += dt;
-    const o = r.objective,
-      alive = G.enemies.filter(e => e.hp > 0),
+    const o = r.objective;
+    if (o.type === 'defense') o.x = 800;
+    const alive = G.enemies.filter(e => e.hp > 0),
       near = alive.filter(e => Math.abs(e.x - o.x) < 130 && Math.abs(e.y - 610) < 70);
     o.timeLeft = Math.max(0, o.timeLeft - dt);
     if (o.type === 'survival') o.current += dt;
     if (o.type === 'escort') {
-      if (Math.abs(G.p.x - o.x) < 180 && Math.abs(G.p.y - 610) < 120 && !near.length) {
+      if (!G.objectiveBlockReason()) {
         o.x += dt * 42;
         o.current = o.x - 240;
       }
@@ -117,8 +134,7 @@
     }
     if (o.type === 'defense') {
       o.x = 800;
-      if (Math.abs(G.p.x - o.x) < 210 && Math.abs(G.p.y - 610) < 160 && !near.length)
-        o.current += dt;
+      if (!G.objectiveBlockReason()) o.current += dt;
       o.health = Math.max(0, o.health - near.length * dt * 2);
     }
     if (o.type === 'elite' && alive.some(e => e.elite))
@@ -135,7 +151,7 @@
     }
     o.remaining = Math.max(0, o.target - o.current);
     if (o.health <= 0 || (['escort', 'defense'].includes(o.type) && o.timeLeft === 0)) {
-      G.failRun('objective');
+      G.failRun(o.health <= 0 ? 'target-destroyed' : 'objective-timeout');
       return;
     }
     if (o.current >= o.target) {

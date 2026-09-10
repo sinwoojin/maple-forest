@@ -88,6 +88,7 @@
             : '확정 효과';
       for (const value of [
         category,
+        item.encounter && '목표 ' + G.objectiveTitle(item.encounter),
         item.risk && '위험 ' + item.risk,
         item.rewardHint,
         item.cost != null ? item.cost + ' 골드' : null
@@ -148,7 +149,7 @@
             G.selectBuild(id);
             if (relic && !G.p.run.relics.includes(relic)) G.grantRelic(relic);
             G.save();
-            G.notify('40단계 원정 시작 · Shift로 회피 · E로 원정 메뉴');
+            G.notify(G.objectiveView().instruction + ' · E로 원정 메뉴');
           };
           const relics = G.startingRelicChoices?.() || [];
           if (relics.length && !daily)
@@ -221,6 +222,14 @@
       actions,
       true
     );
+    if (r?.active && r.phase === 'battle') {
+      const objective = G.objectiveView();
+      U.paragraph(objective.title + ' · ' + objective.progress);
+      U.paragraph(objective.status);
+      U.paragraph(objective.instruction);
+    }
+    if (r?.rulesVersion === 2)
+      U.paragraph('방어력의 피해 감소는 공격 피해의 최대 60%까지 적용됩니다.');
     if (r)
       U.paragraph(
         `${r.stage} / 40 · ${phases[r.phase] || r.phase} · ${G.buildInfo?.().name || '전투 방식 미선택'}`
@@ -342,6 +351,9 @@
     U.paragraph(
       `${r.stage} / 40 단계 · ${G.jobs[G.p.job].name} · ${Math.floor((r.elapsedSeconds || 0) / 60)}분`
     );
+    const outcome = G.outcomeView(r.outcome);
+    U.paragraph(outcome.cause);
+    U.paragraph(outcome.snapshot);
     U.paragraph(G.buildInfo?.().name || '');
     U.paragraph(
       '원정에서 얻은 장비와 모험 기록은 남습니다. 다른 길과 전투 방식으로 다시 도전해 보세요.'
@@ -374,24 +386,22 @@
     $('stage-ribbon').hidden = !active;
     if (!active) return;
     const i = G.runInfo(),
-      objective = i.objective?.label || `남은 적 ${i.remaining}마리`;
+      objective = G.objectiveView();
     $('stage-number').textContent = `STAGE ${String(i.stage).padStart(2, '0')} / 40`;
     $('stage-theme').textContent = i.name;
     $('stage-progress').value = i.stage;
-    $('stage-counter').textContent =
-      i.phase === 'battle'
-        ? `${objective} · ${Math.ceil(i.objective?.remaining || 0)} 남음 · ${Math.ceil(i.objective?.timeLeft || 0)}초`
-        : phases[i.phase];
+    $('stage-counter').textContent = i.phase === 'battle' ? objective.progress : phases[i.phase];
     $('area').textContent = i.name;
     document.querySelector('.location .eyebrow').textContent =
       `CHAPTER ${i.chapter || Math.ceil(i.stage / 10)} · EXPEDITION`;
     document.querySelector('.location-sub').textContent = G.buildInfo?.().name || '성장의 여정';
-    $('quest-title').textContent = i.phase === 'battle' ? objective : phases[i.phase];
+    $('quest-title').textContent = i.phase === 'battle' ? objective.title : phases[i.phase];
     $('quest-copy').textContent =
       i.phase === 'battle'
-        ? '위험 표시를 확인하고 Shift / 회피로 피하세요.'
+        ? objective.status + ' · ' + objective.instruction
         : 'E 또는 도전 버튼으로 선택을 이어가세요.';
-    $('quest-count').textContent = i.phase === 'battle' ? `${i.remaining}마리 남음` : '선택 대기';
+    $('quest-count').textContent =
+      i.phase === 'battle' ? objective.progress.split(' · ')[0] : '선택 대기';
     $('quest-reward').textContent = i.boss ? '지역 보스' : '갈림길과 성장';
     $('prompt').hidden = G.paused || !G.running || i.phase === 'battle';
     $('prompt').textContent = 'E · 다음 선택 열기';
