@@ -245,3 +245,23 @@ test('legacy route presentation explains actual objective without rewriting stor
   G.continueRun();
   assert.equal(G.p.run.nodeType, supply.encounter);
 });
+
+test('imported enemy labels cannot interrupt lethal-hit outcome recording', () => {
+  for (const label of ['x'.repeat(101), { unexpected: true }]) {
+    const G = game();
+    G.enemies = [G.spawnEnemy({ hp: 50, x: 300, y: 610 })];
+    const raw = JSON.parse(G.exportSave());
+    raw.run.enemies[0].label = label;
+    raw.run.player.hp = 1;
+    assert(G.importSave(JSON.stringify(raw)).ok);
+    G.resumeRun();
+    G.p.invuln = 0;
+    assert.doesNotThrow(() => G.damagePlayer(999, G.enemies[0]));
+    assert.equal(G.p.run.phase, 'failed');
+    const expected = typeof label === 'string' ? 'x'.repeat(99) + '…' : '종료 원인 상세 기록 없음';
+    assert.equal(G.p.run.outcome.cause, expected);
+    assert.equal(G.history()[0].cause, expected);
+    assert(G.importSave(G.exportSave()).ok);
+    assert.equal(G.p.run.outcome.cause, expected);
+  }
+});

@@ -227,6 +227,12 @@
   G.failRun = (cause = 'defeated') => {
     const r = G.p.run;
     if (!r.active || r.phase !== 'battle') return false;
+    cause =
+      typeof cause === 'string' && cause.length > 0
+        ? cause.length > 100
+          ? cause.slice(0, 99) + '…'
+          : cause
+        : '종료 원인 상세 기록 없음';
     r.rewards = [];
     G.captureRunOutcome(cause);
     r.buffs = { attack: 0, defense: 0 };
