@@ -77,3 +77,10 @@ Keyboard and touch actions, visible focus, text health values, readable Korean l
 - Native modal becomes fixed header/body/footer scroll shell. Bag has one scroll owner, keeps sort/selected item/scroll after actions. Choice cards separate effects, cost/risk and optional detail; touch drag cannot trigger choices.
 - Input ownership is per pointer and per keyboard key. Pointer release/cancel/lostcapture, blur, hidden tab, orientation and modal open clear all held input. Orientation pauses active battle without changing run or decision. No auto attack/potion additions.
 - HUD refresh coalesces to100ms; new HUD text writes only changed content. Existing camera art and settings remain. Physical mobile Safari cannot be certified by Chromium emulation.
+
+## Objective and outcome clarity · 2026-09-10
+
+- Reuse the stage ribbon, quest copy, mobile objective, choice cards and dialog paragraphs with existing type, paper and spacing tokens. No additional modal or combat controls.
+- Survival uses seconds; escort and defense use percent plus target health and remaining time. Both HUDs derive blocking feedback from the same encounter rule: nearby enemies, distance, or height. Reading HUD state never advances the objective.
+- First encounter guidance appears in the existing notification and remains available in the expedition dialog. The mobile player can read the current condition without opening a menu.
+- End screens and archives show only captured failure cause and the recorded objective/player snapshot. Older records explicitly report unavailable details. Route cards expose their actual encounter, cost, risk and reward before selection.

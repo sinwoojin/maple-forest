@@ -1437,13 +1437,13 @@ dialog p {
   color: var(--paper);
 }
 .record-row {
+  overflow-wrap: anywhere;
   padding: var(--s4) 0;
   border-bottom: 1px solid var(--border);
 }
 .record-row p {
   font-size: 12px;
   margin: var(--s2) 0 0;
-  overflow-wrap: anywhere;
 }
 .settings-list {
   display: grid;

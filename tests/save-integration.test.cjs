@@ -24,11 +24,13 @@ function game() {
     'boss-ai',
     'combat',
     'stages',
+    'route-options',
     'route-content',
     'event-data',
     'events',
     'encounters',
     'event-validation',
+    'run-details',
     'run-validation',
     'meta',
     'persistence'
@@ -40,6 +42,7 @@ test('event save parser rejects array relic IDs without replacing current progre
   const G = game();
   G.startRun({ seed: 99 });
   G.p.run.phase = 'event';
+  G.p.run.nextEncounter = 'defeat';
   G.prepareRunEvent();
   const saved = G.exportSave();
   assert.equal(G.importSave(saved).ok, true);

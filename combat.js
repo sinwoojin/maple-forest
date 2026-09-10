@@ -25,7 +25,14 @@
     }
     const hit = Math.max(
       1,
-      Math.round((amount - G.equipmentStats().defense) * (G.hasRelic('shell') ? 0.8 : 1))
+      Math.round(
+        (amount -
+          Math.min(
+            G.equipmentStats().defense,
+            p.run?.active && p.run.rulesVersion === 2 ? amount * 0.6 : Infinity
+          )) *
+          (G.hasRelic('shell') ? 0.8 : 1)
+      )
     );
     p.hp = Math.max(0, p.hp - hit);
     p.invuln = 0.8;

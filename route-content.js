@@ -4,6 +4,7 @@
   G.makeRouteChoices = () => {
     const r = G.p.run,
       next = r.stage + 1;
+    if (r.rulesVersion === 2) return G.makeModernRoutes();
     if (next % 10 === 0)
       return [
         {
@@ -43,7 +44,25 @@
       }
     ];
   };
-  G.routeChoices = () => G.runCopy(G.p.run.routes);
+  G.routeChoices = () => {
+    const r = G.p.run;
+    return G.runCopy(r.routes).map(c => {
+      if (r.rulesVersion === 2) return c;
+      const supply = ['event', 'shop', 'rest'].includes(c.type);
+      return {
+        ...c,
+        encounter: supply ? ['defeat', 'escort', 'defense', 'survival'][(r.stage + 1) % 4] : c.type,
+        risk: supply
+          ? '보급 뒤 전투'
+          : c.type === 'boss'
+            ? '보스 패턴'
+            : c.type === 'elite'
+              ? '적 회복 오라'
+              : '사전 보급 없음',
+        rewardHint: supply ? '준비 기회 · 전투 보상 1개' : '진입 +35골드 · 전투 보상 1개'
+      };
+    });
+  };
   G.chooseRoute = id => {
     const r = G.p.run;
     if (!r.active || r.phase !== 'route') return false;
@@ -55,6 +74,8 @@
     r.event = null;
     r.shop = [];
     r.restUsed = false;
+    r.nextEncounter =
+      r.rulesVersion === 2 && ['event', 'shop', 'rest'].includes(c.type) ? c.encounter : null;
     if (c.type === 'event') {
       G.prepareRunEvent();
       G.runTransition('event');
@@ -88,8 +109,8 @@
       G.runTransition('shop');
     } else if (c.type === 'rest') G.runTransition('rest');
     else {
-      G.p.gold += 35;
-      G.enterEncounter(c.type);
+      G.p.gold += c.type === 'boss' && r.rulesVersion === 2 ? 0 : r.rulesVersion === 2 ? 60 : 35;
+      G.enterEncounter(r.rulesVersion === 2 ? c.encounter : c.type);
     }
     return true;
   };
@@ -151,7 +172,11 @@
       (r.phase === 'rest' && !r.restUsed)
     )
       return false;
-    G.enterEncounter(['defeat', 'escort', 'defense', 'survival'][r.stage % 4]);
+    G.enterEncounter(
+      r.rulesVersion === 2
+        ? r.nextEncounter
+        : ['defeat', 'escort', 'defense', 'survival'][r.stage % 4]
+    );
     return true;
   };
 })();
@@ -172,7 +197,13 @@
         title: '개척자의 보급로',
         description: '이전 원정에서 발견한 안전한 모닥불',
         type: 'rest',
-        risk: '낮음',
+        ...(r.rulesVersion === 2
+          ? {
+              encounter:
+                choices.find(c => ['event', 'shop', 'rest'].includes(c.type))?.encounter || 'defeat'
+            }
+          : {}),
+        risk: r.rulesVersion === 2 ? '보급 뒤 전투' : '낮음',
         rewardHint: '회복 또는 수련'
       });
     return choices;

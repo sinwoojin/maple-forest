@@ -34,6 +34,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     await page.locator('#close-modal').click();
     await page.evaluate(() => {
       Game.p.run.phase = 'rest';
+      Game.p.run.nextEncounter = 'defeat';
       Game.p.run.restUsed = false;
       Game.openRunUI();
     });
@@ -41,9 +42,36 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     assert.equal(await page.evaluate(() => Game.p.run.restUsed), true);
     await page.getByRole('button', { name: '야영지 떠나기' }).click();
     assert.equal(await page.evaluate(() => Game.p.run.phase), 'battle');
+    await page.evaluate(() => {
+      Game.failRun('x'.repeat(101));
+      Game.UI.archive();
+    });
+    for (const [width, height] of [
+      [360, 800],
+      [390, 844],
+      [844, 390],
+      [1280, 900]
+    ]) {
+      await page.setViewportSize({ width, height });
+      const rows = await page
+        .locator('.record-row')
+        .evaluateAll(elements =>
+          elements.map(row => ({ width: row.clientWidth, content: row.scrollWidth }))
+        );
+      assert(rows.length > 0);
+      assert(
+        rows.every(row => row.content <= row.width),
+        'history text must remain inside its card'
+      );
+      assert((await page.locator('.archive-list').textContent()).includes('x'.repeat(99) + '…'));
+      if (process.env.ARTIFACT_DIR)
+        await page.screenshot({
+          path: process.env.ARTIFACT_DIR + '/history-long-' + width + '.png'
+        });
+    }
     assert.deepEqual(errors, []);
     console.log(
-      'PASS fresh start, build selection, settings, camp continuation; no browser errors'
+      'PASS fresh start, build selection, settings, camp continuation, fixture long-name history at four sizes; no browser errors'
     );
   } finally {
     await browser.close();

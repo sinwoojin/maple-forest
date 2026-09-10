@@ -15,11 +15,13 @@ for (const file of [
   'boss-ai.js',
   'combat.js',
   'stages.js',
+  'route-options.js',
   'route-content.js',
   'event-data.js',
   'events.js',
   'encounters.js',
   'event-validation.js',
+  'run-details.js',
   'run-validation.js'
 ])
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), ctx, { filename: file });
@@ -74,6 +76,7 @@ assert.equal(G.failRun(), false);
 for (const event of G.runEventCatalog) {
   G.startRun({ seed: 123 });
   G.p.run.phase = 'event';
+  G.p.run.nextEncounter = 'defeat';
   G.p.run.event = { id: event.id, roll: 0.2, relic: null, result: null, choice: null };
   G.p.gold = 1000;
   G.p.materials = 100;
@@ -109,6 +112,7 @@ console.log(
 );
 // Utility nodes must retain their claims across reloads.
 G.startRun({ seed: 321 });
+G.p.run.rulesVersion = 1; // Preserve regression coverage for saved legacy utility offers.
 G.p.run.stage = 1;
 G.p.run.phase = 'route';
 G.p.run.routes = [{ id: '2:shop', type: 'shop' }];

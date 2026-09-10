@@ -17,6 +17,7 @@
               '루미 근처에서 직업 변경 · I로 장비 확인 · 오른쪽으로 모험 출발!',
               '왼손 이동 · 오른손 전투 · 메뉴에서 조작 안내'
             )
+            .replace('E로 원정 메뉴', '원정 버튼으로 메뉴')
         : message
     );
 
@@ -144,7 +145,7 @@
     text($('mobile-stage'), active ? `${r.stage} / 40` : `${G.jobs[p.job].name} Lv.${p.level}`);
     const objective = active
       ? r.phase === 'battle'
-        ? `${info.objective?.label || '적을 처치하세요'} · ${Math.ceil(info.objective?.remaining || 0)} 남음`
+        ? [G.objectiveView().progress, G.objectiveView().status].filter(Boolean).join(' · ')
         : '상단 도전에서 선택을 이어가세요'
       : document.getElementById('quest-copy').textContent;
     text($('mobile-objective'), objective);

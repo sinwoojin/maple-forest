@@ -27,6 +27,11 @@ fs.mkdirSync(output, { recursive: true });
     await page.getByRole('button', { name: '새 원정 시작', exact: true }).tap();
     await page.locator('.job-card.warrior').tap();
     await page.locator('.reward-card').first().tap();
+    const startHint = await page.locator('#toast').textContent();
+    assert(startHint.includes('원정 버튼으로 메뉴'));
+    assert(!startHint.includes('E로'));
+    assert(startHint.includes('습격'));
+    record('mobile start preserves objective guidance and uses touch menu hint');
     const cdp = await context.newCDPSession(page);
     const point = async (selector, id) => {
       const b = await page.locator(selector).boundingBox();
