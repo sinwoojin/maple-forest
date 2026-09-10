@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),ctx={window:{},console,Math,Set,Uint32Array,Date};vm.createContext(ctx);
-for(const file of ['engine.js','systems.js','builds.js','relics.js','enemy-ai.js','boss-ai.js','combat.js','stages.js','route-content.js','event-data.js','events.js','encounters.js','run-validation.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),ctx,{filename:file});
+for(const file of ['engine.js','systems.js','builds.js','relics.js','enemy-ai.js','boss-ai.js','combat.js','stages.js','route-content.js','event-data.js','events.js','encounters.js','event-validation.js','run-validation.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),ctx,{filename:file});
 const G=ctx.window.Game;G.save=()=>{G.snapshotRun();return true;};G.running=true;G.startRun({seed:123,build:'bleed'});assert.equal(G.p.run.build,'bleed');
 let checks=0;const check=()=>{G.snapshotRun();assert.equal(G.parseRun(JSON.parse(JSON.stringify(G.p.run))).stage,G.p.run.stage);checks++;};
 check();let elapsed=G.p.run.elapsedSeconds;G.paused=true;G.updateEncounter(.1);assert.equal(G.p.run.elapsedSeconds,elapsed);G.paused=false;

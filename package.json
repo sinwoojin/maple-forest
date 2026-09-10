@@ -5,8 +5,17 @@
   "scripts": {
     "start": "node mobile-server.cjs",
     "test": "node --test --test-isolation=none tests/*.test.cjs tests/run-content.cjs",
-    "build": "node scripts/package-static.cjs",
+    "build": "npm run build:typed && node scripts/package-static.cjs",
     "test:browser": "node tests/ui-smoke.cjs",
-    "test:mobile": "node tests/mobile-ui.cjs"
+    "test:mobile": "node tests/mobile-ui.cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build:typed": "node scripts/typed-build.cjs",
+    "check:generated": "node scripts/typed-build.cjs --check",
+    "test:types": "node tests/type-contracts.cjs",
+    "pretest": "npm run build:typed",
+    "prestart": "npm run build:typed"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
   }
 }

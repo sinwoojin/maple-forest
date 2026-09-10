@@ -23,7 +23,7 @@
  if(r.phase==='route')requireValid(r.stage<40&&r.routes.length>0,'Missing route');
  if(r.phase==='reward')requireValid(r.rewards.length===3,'Missing reward');else requireValid(r.rewards.length===0,'Unexpected reward');
  for(const c of r.rewards){requireValid(c&&c.id===`${r.stage}:${c.kind}`&&['gear','heal','relic','attack','materials'].includes(c.kind),'Invalid reward');if(c.kind==='gear')requireValid(Object.hasOwn(G.items,c.item),'Invalid gear reward');if(c.kind==='relic')requireValid(Object.hasOwn(G.relicCatalog||{},c.item),'Invalid relic reward');if(c.kind==='materials')requireValid(c.value===4,'Invalid material reward');if(c.kind==='attack')requireValid(c.value===3,'Invalid attack reward');}
- if(r.event!==null){const data=G.runEventCatalog.find(e=>e.id===r.event.id);requireValid(data&&number(r.event.roll,0,1)&&(!r.event.relic||Object.hasOwn(G.relicCatalog||{},r.event.relic))&&(r.event.result===null||typeof r.event.result==='string')&&(r.event.choice===null||r.event.choice==='leave'||data.choices.some(c=>c.id===r.event.choice)),'Invalid event');requireValid((r.event.result===null)===(r.event.choice===null),'Invalid event result');}
+ r.event=G.parseEventSnapshot(r.event);
  if(r.phase==='event')requireValid(r.event!==null,'Missing event');
  const shopRules={potions:{suffix:'potion',cost:45,value:3},attack:{suffix:'forge',cost:80,value:4},defense:{suffix:'ward',cost:65,value:2}};
  for(const c of r.shop){const rule=shopRules[c.kind];requireValid(rule&&c.id===`${r.stage}:${rule.suffix}`&&c.cost===rule.cost&&c.value===rule.value&&(c.bought===undefined||typeof c.bought==='boolean'),'Invalid shop');}

@@ -51,6 +51,12 @@
 
 오늘의 원정에 들어가기 전 일반 원정을 마무리하거나 중단하세요. 날짜는 UTC 기준이므로 한국에서는 오전 9시에 새 시드로 바뀝니다.
 
+## TypeScript 개발
+
+이벤트 데이터·선택 로직·저장 이벤트 검증을 strict TypeScript로 전환했습니다. 나머지 게임은 기존 JS/Canvas를 유지합니다. 최초 개발 시 `npm ci --include=dev`를 실행하세요. TS 편집 후 `npm run build:typed`로 실행용 JS를 생성합니다. `npm test`, `npm start`, `npm run build`도 먼저 컴파일합니다. 루트의 생성된 이벤트 JS 세 파일은 직접 편집하지 않습니다.
+
+도입 기준, JS·TS 공존 범위와 검증 방식은 [TypeScript 안내](docs/TYPESCRIPT.md)에 정리했습니다. `npm run typecheck`, `npm run test:types`, `npm run check:generated`로 타입 및 생성물 일치를 확인합니다.
+
 ## 개발과 검증
 
 ```sh
@@ -58,7 +64,7 @@ npm test
 npm run build
 ```
 
-`npm run build`는 번들러 없이 `index.html`이 참조하는 공개 JS/CSS만 `public/`에 복사합니다. 원본 파일은 직접 브라우저에서 실행할 수 있습니다. `npm test`는 전투·원정·저장 테스트를 프로세스 격리 없이 실행합니다.
+`npm run build`는 이벤트 TS를 컴파일한 뒤 번들러 없이 `index.html`이 참조하는 공개 JS/CSS만 `public/`에 복사합니다. 원본 파일은 직접 브라우저에서 실행할 수 있습니다. `npm test`는 전투·원정·저장 테스트를 프로세스 격리 없이 실행합니다.
 
 브라우저 검사에는 별도 개발 도구가 필요합니다. `npm install --no-save playwright`으로 도구를 준비하고 설치된 Google Chrome을 사용하세요(기본 채널 `chrome`). `npm start`를 실행한 상태에서 `npm run test:browser`를 실행합니다. Chrome 대신 번들 Chromium을 쓰려면 `npx playwright install chromium` 실행 후 `BROWSER_CHANNEL=chromium` 환경 변수를 지정하세요. `BASE_URL`(기본 `http://127.0.0.1:8765`), `BROWSER_CHANNEL`, `PLAYWRIGHT_PATH`로 서버 주소·설치 브라우저·모듈 위치를 지정할 수 있습니다.
 
