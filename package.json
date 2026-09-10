@@ -5,8 +5,20 @@
   "scripts": {
     "start": "node mobile-server.cjs",
     "test": "node --test --test-isolation=none tests/*.test.cjs tests/run-content.cjs",
-    "build": "node scripts/package-static.cjs",
+    "build": "npm run build:typed && node scripts/package-static.cjs",
     "test:browser": "node tests/ui-smoke.cjs",
-    "test:mobile": "node tests/mobile-ui.cjs"
+    "test:mobile": "node tests/mobile-ui.cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build:typed": "node scripts/typed-build.cjs",
+    "check:generated": "node scripts/typed-build.cjs --check",
+    "test:types": "node tests/type-contracts.cjs",
+    "pretest": "npm run build:typed",
+    "prestart": "npm run build:typed",
+    "format": "prettier --write \"*.{js,cjs,json,css,html,md}\" \"{src,types,tests,scripts,docs}/**/*.{js,cjs,ts,json,css,html,md}\" \".github/workflows/*.{yml,yaml}\" \".prettierrc.json\"",
+    "format:check": "prettier --check \"*.{js,cjs,json,css,html,md}\" \"{src,types,tests,scripts,docs}/**/*.{js,cjs,ts,json,css,html,md}\" \".github/workflows/*.{yml,yaml}\" \".prettierrc.json\""
+  },
+  "devDependencies": {
+    "prettier": "3.9.6",
+    "typescript": "7.0.2"
   }
 }

@@ -22,3 +22,6 @@ public/
 evidence/
 artifacts/
 *.token
+
+# Intermediate TypeScript compiler output
+.generated/

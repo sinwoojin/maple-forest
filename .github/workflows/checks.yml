@@ -1,0 +1,23 @@
+name: TypeScript and game checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '26'
+          cache: npm
+      - run: npm ci --include=dev
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run check:generated
+      - run: npm run test:types
+      - run: npm test
+      - run: npm run build

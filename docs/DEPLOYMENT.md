@@ -1,6 +1,6 @@
 # Vercel static deployment
 
-Configuration: Other framework (`framework: null`), repository root, build command `npm run build`, output `public`, no dependency installation. Runtime remains classic JavaScript; packaging only copies referenced public HTML/CSS/JS. Private `.omo`, evidence, logs, secrets, tests and server code are not served from the output. The local server also allows only game assets referenced by the HTML.
+Configuration: Other framework (`framework: null`), repository root, build command `npm run build`, output `public`, install command `npm ci --include=dev` to provide the pinned TypeScript compiler. Runtime remains classic JavaScript; the build first type-checks and compiles the three event scripts, then packaging copies referenced public HTML/CSS/JS. See [TypeScript development](TYPESCRIPT.md). Private `.omo`, evidence, logs, secrets, tests and server code are not served from the output. The local server also allows only game assets referenced by the HTML.
 
 ## Production deployment · 2026-09-09
 

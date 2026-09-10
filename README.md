@@ -25,17 +25,17 @@
 
 ## 조작
 
-| 입력 | 동작 |
-| --- | --- |
-| A/D, ←/→ | 이동 |
-| Space, W, ↑ | 점프 |
-| Z | 기본 공격 |
-| X | 직업 기술 |
-| Shift | 회피 |
-| C | 물약 |
-| E | 상호작용·원정 선택 다시 열기 |
-| I | 가방 |
-| Esc | 일시정지·창 닫기 |
+| 입력        | 동작                         |
+| ----------- | ---------------------------- |
+| A/D, ←/→    | 이동                         |
+| Space, W, ↑ | 점프                         |
+| Z           | 기본 공격                    |
+| X           | 직업 기술                    |
+| Shift       | 회피                         |
+| C           | 물약                         |
+| E           | 상호작용·원정 선택 다시 열기 |
+| I           | 가방                         |
+| Esc         | 일시정지·창 닫기             |
 
 모바일은 왼손으로 좌우 이동, 오른손으로 점프·스킬·회피·공격을 조작합니다. 이동하면서 공격·점프할 수 있으며, 스킬과 회피 버튼에 남은 시간이 표시됩니다. 세로·가로 화면을 모두 지원합니다.
 
@@ -51,6 +51,12 @@
 
 오늘의 원정에 들어가기 전 일반 원정을 마무리하거나 중단하세요. 날짜는 UTC 기준이므로 한국에서는 오전 9시에 새 시드로 바뀝니다.
 
+## TypeScript 개발
+
+이벤트 데이터·선택 로직·저장 이벤트 검증을 strict TypeScript로 전환했습니다. 나머지 게임은 기존 JS/Canvas를 유지합니다. 최초 개발 시 `npm ci --include=dev`를 실행하세요. TS 편집 후 `npm run build:typed`로 실행용 JS를 생성합니다. `npm test`, `npm start`, `npm run build`도 먼저 컴파일합니다. 루트의 생성된 이벤트 JS 세 파일은 직접 편집하지 않습니다.
+
+도입 기준, JS·TS 공존 범위와 검증 방식은 [TypeScript 안내](docs/TYPESCRIPT.md)에 정리했습니다. `npm run typecheck`, `npm run test:types`, `npm run check:generated`로 타입 및 생성물 일치를 확인합니다.
+
 ## 개발과 검증
 
 ```sh
@@ -58,7 +64,7 @@ npm test
 npm run build
 ```
 
-`npm run build`는 번들러 없이 `index.html`이 참조하는 공개 JS/CSS만 `public/`에 복사합니다. 원본 파일은 직접 브라우저에서 실행할 수 있습니다. `npm test`는 전투·원정·저장 테스트를 프로세스 격리 없이 실행합니다.
+`npm run build`는 이벤트 TS를 컴파일한 뒤 번들러 없이 `index.html`이 참조하는 공개 JS/CSS만 `public/`에 복사합니다. 원본 파일은 직접 브라우저에서 실행할 수 있습니다. `npm test`는 전투·원정·저장 테스트를 프로세스 격리 없이 실행합니다.
 
 브라우저 검사에는 별도 개발 도구가 필요합니다. `npm install --no-save playwright`으로 도구를 준비하고 설치된 Google Chrome을 사용하세요(기본 채널 `chrome`). `npm start`를 실행한 상태에서 `npm run test:browser`를 실행합니다. Chrome 대신 번들 Chromium을 쓰려면 `npx playwright install chromium` 실행 후 `BROWSER_CHANNEL=chromium` 환경 변수를 지정하세요. `BASE_URL`(기본 `http://127.0.0.1:8765`), `BROWSER_CHANNEL`, `PLAYWRIGHT_PATH`로 서버 주소·설치 브라우저·모듈 위치를 지정할 수 있습니다.
 
@@ -71,3 +77,13 @@ npm run build
 ## 프로젝트 배경
 
 메이플스토리의 횡스크롤 모험과 PokéRogue의 연속 전투·선택 흐름에서 영감을 받았습니다. 공식 프로젝트가 아니며 원작 계정·서버·게임 에셋을 사용하지 않습니다. 그래픽과 사운드는 프로젝트 코드에서 생성합니다.
+
+## 코드 포맷
+
+`npm run format`으로 적용하고 `npm run format:check`로 파일 변경 없이 검사합니다. CI도 같은 범위를 검사합니다. npm에 고정한 Prettier 3.9.6을 사용하며 별도 ESLint/Biome/Git hook은 추가하지 않습니다.
+
+공백 2칸, JS·TS 작은따옴표, 세미콜론 사용, 권장 100자, 후행 쉼표 없음, LF를 적용합니다. JSON·HTML 속성은 해당 형식에 맞는 큰따옴표를 사용합니다. Markdown 문단 줄바꿈과 HTML 공백 의미, 템플릿 안의 문자열은 보존하도록 설정했습니다. EditorConfig와 Git 줄바꿈 규칙도 맞췄으며 Windows 실행용 cmd만 CRLF를 유지합니다. 개인 에디터 설정은 변경하지 않습니다.
+
+루트 게임 소스·설정·문서와 src/types/tests/scripts/docs의 JS·CJS·TS·JSON·CSS·HTML·Markdown, CI YAML이 대상입니다. 의존성·빌드·캐시·외부 라이브러리·압축 파일, npm lockfile, 자동 캡처한 이벤트 기준 JSON, TS에서 생성하는 루트 event-data.js/events.js/event-validation.js는 제외합니다. TS 소스를 포맷한 뒤 `npm run build:typed`로 생성 JS를 갱신해 함께 커밋하세요.
+
+설정 근거: [Prettier 옵션](https://prettier.io/docs/options), [제외 규칙](https://prettier.io/docs/ignore).
